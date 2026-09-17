@@ -3,7 +3,6 @@ import json
 
 mastodon = Mastodon(access_token="pytooter_usercred.secret")
 
-#Keywords: hurricanelowell, lowell, kauai, hurricane, FlashFlood, flooding
 def getDataPerHashtag(hashtag):
     toot_batch = mastodon.timeline_hashtag(hashtag)
     data = list(toot_batch)
@@ -85,6 +84,6 @@ def addStatusContext():
     
 ###MAIN###
 
-# getHashtagData()
-# removeDuplicateStatuses()
+getHashtagData()
+removeDuplicateStatuses()
 addStatusContext()
