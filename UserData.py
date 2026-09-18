@@ -1,4 +1,6 @@
 from mastodon import Mastodon
+import datetime
+import json
 
 # 1Look at user account posts
 #   Check every post for the mentions field
@@ -10,20 +12,40 @@ mastodon = Mastodon(access_token="pytooter_usercred.secret")
 
 
 def convertAccountNameToId(name):
-    return mastodon.account_lookup(name).id
+    return str(mastodon.account_lookup(name).id)
 
 
-def getStatusesPerAccount(id):
-    toot_batch = mastodon.account_statuses(id)
-    data = list(toot_batch)
+def getStatusesPerAccount(handle):
+    endDate = datetime.date(day=17, month=9, year=2026)
+    startDate = datetime.date(day=1, month=9, year=2026)
+    toot_batch = mastodon.account_statuses(convertAccountNameToId(handle))
+    data = list()
+    enteredRange = False
 
     while True:
-        toot_batch = mastodon.fetch_next(toot_batch)
-        if toot_batch is None or len(data) >= 50:
-            break
-        data.extend(toot_batch)
 
-        print("Appended new posts! " + id)
+        for post in toot_batch:
+            correctRange = (
+                post.created_at.date() >= startDate
+                and post.created_at.date() <= endDate
+            )
+            started_in_past = (not enteredRange) and post.created_at.date() < startDate
+            finished_timeband = (not correctRange) and enteredRange
+
+            if correctRange:
+                enteredRange = True
+                data.append(post)
+
+            elif started_in_past or finished_timeband:
+                print("Appended new posts! " + handle + " " + str(len(data)))
+                return data
+
+        toot_batch = mastodon.fetch_next(toot_batch)
+
+        if toot_batch is None:
+            break
+
+        print("Appended new posts! " + handle + " " + str(len(data)))
 
     return data
 
@@ -41,22 +63,25 @@ def getMentionsFromStatuses(data):
 
 def getAccountsFromSeeds(seeds):
 
-    account_queue = list([convertAccountNameToId(account) for account in seeds])
-    static_account_list = list([convertAccountNameToId(account) for account in seeds])
+    account_queue = list(seeds)
+    static_account_list = list(account_queue.copy())
 
-    for i in range(len(account_queue)):
-        id = convertAccountNameToId(account_queue[i])
+    while len(account_queue) != 0:
+        print("Gathering posts from " + account_queue[0])
+        statuses = getStatusesPerAccount(account_queue[0])
 
         account_queue.pop(0)
-        i -= 1
 
-        statuses = getStatusesPerAccount(id)
         account_mentions = getMentionsFromStatuses(statuses)
         account_queue.extend(account_mentions)
         static_account_list.extend(account_mentions)
 
+    return static_account_list
 
-seedsAccounts = [
+
+### MAIN ###
+
+seedAccounts = [
     "@patlikestechnology@infosec.exchange",
     "@ai6yr@m.ai6yr.org",
     "@jalley@sfba.social",
@@ -64,3 +89,8 @@ seedsAccounts = [
     "@BruceMirken@mas.to",
     "@WeatherGoddess@journa.host",
 ]
+
+accounts = getAccountsFromSeeds(seedAccounts)
+
+with open("UserData.json", "w") as file:
+    json.dump(accounts, file, default=str, indent=2)
