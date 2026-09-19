@@ -28,6 +28,6 @@ for toot in postData:
         G.add_edge(toot["id"], toot["reblog"]["id"])
 
 for node in postData:
-    G.nodes[node["id"]]["Size"] = G.degree(node["id"]) * 10
+    G.nodes[node["id"]]["Size"] = (2.71)**(G.degree(node["id"]))
      
 nx.write_gexf(G, "TootGraph.gexf")
