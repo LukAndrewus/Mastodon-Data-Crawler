@@ -63,7 +63,7 @@ def getStatusesPerAccount(id):
     return data
 
 
-def getMentionsFromStatuses(data):
+def getMentionsFromStatuses(data, parentID) -> list[tuple[str, str]]:
     accounts = set()
 
     for status in data:
@@ -71,22 +71,21 @@ def getMentionsFromStatuses(data):
             for account in status["mentions"]:
                 accounts.add(account["id"])
 
-    return list(accounts)
+    return [(account, parentID) for account in accounts]
 
 
 def getAccountsFromSeeds(seeds):
 
-    account_queue = list([convertAccountNameToId(account) for account in seeds])
-    static_account_list = list(account_queue.copy())
+    account_queue = [(convertAccountNameToId(account), "") for account in seeds]
+    static_account_list = account_queue.copy()
 
     while len(account_queue) != 0 and len(static_account_list) < 1000:
-        print(f"Gathering posts from {mastodon.account(account_queue[0]).acct}")
-        statuses = getStatusesPerAccount(account_queue[0])
+        print(f"Gathering posts from {mastodon.account(account_queue[0][0]).acct}")
+        statuses = getStatusesPerAccount(account_queue[0][0])
+        account_mentions = getMentionsFromStatuses(statuses, account_queue[0])
+        print(f"Gained {len(account_mentions)} users from posts!\n")
 
         account_queue.pop(0)
-
-        account_mentions = getMentionsFromStatuses(statuses)
-        print(f"Gained {len(account_mentions)} from user posts!\n")
 
         account_queue.extend(account_mentions)
         static_account_list.extend(account_mentions)
@@ -94,18 +93,25 @@ def getAccountsFromSeeds(seeds):
     return static_account_list
 
 
-def expandAccountIds(accounts):
+def expandAccountIds(accounts: list[tuple[str, str]]) -> list[dict]:
     print(accounts)
 
     expandedList = list()
 
-    for accountId in accounts:
-        try:
-            expandedList.append(mastodon.account(accountId))
-            time.sleep(1)
-        except MastodonError as e:
-            print(f"API Error with acct retrieval {e}")
-            continue
+    for accountIdTuple in accounts:
+        while True:
+            try:
+                accountInfo = mastodon.account(accountIdTuple[0])
+                accountInfo["mentioned_by"] = (
+                    accountIdTuple[1] if accountIdTuple[1] != "" else None
+                )
+                expandedList.append(accountInfo)
+                print(f"Gathered info for {accountInfo['acct']}")
+                time.sleep(1)
+                break
+            except MastodonError as e:
+                print(f"API Error with acct retrieval {e}")
+                continue
 
     return expandedList
 
