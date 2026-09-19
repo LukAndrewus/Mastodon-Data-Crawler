@@ -13,7 +13,16 @@ mastodon = Mastodon(access_token="pytooter_usercred.secret")
 
 
 def convertAccountNameToId(name):
-    return str(mastodon.account_lookup(name).id)
+
+    while True:
+        try:
+            Id = str(mastodon.account_lookup(name).id)
+            break
+        except MastodonError as e:
+            print(f"Error looking up account {name}: {e}")
+            Id = None
+
+    return Id
 
 
 def getStatusesPerAccount(id):
@@ -24,8 +33,9 @@ def getStatusesPerAccount(id):
     enteredRange = False
 
     while True:
-        if toot_batch is None: break
-        
+        if toot_batch is None:
+            break
+
         for post in toot_batch:
             correctRange = (
                 post.created_at.date() >= startDate
@@ -43,11 +53,11 @@ def getStatusesPerAccount(id):
 
         if toot_batch is None:
             break
-        
+
         try:
             toot_batch = mastodon.fetch_next(toot_batch)
         except MastodonError as e:
-            print("Error from API" + e)
+            print(f"Error from API {e}")
             break
 
     return data
@@ -70,14 +80,14 @@ def getAccountsFromSeeds(seeds):
     static_account_list = list(account_queue.copy())
 
     while len(account_queue) != 0 and len(static_account_list) < 1000:
-        print("Gathering posts from " + mastodon.account(account_queue[0]).acct)
+        print(f"Gathering posts from {mastodon.account(account_queue[0]).acct}")
         statuses = getStatusesPerAccount(account_queue[0])
 
         account_queue.pop(0)
 
         account_mentions = getMentionsFromStatuses(statuses)
-        print("Gained " + str(len(account_mentions)) + " from user posts!\n")
-        
+        print(f"Gained {len(account_mentions)} from user posts!\n")
+
         account_queue.extend(account_mentions)
         static_account_list.extend(account_mentions)
 
@@ -86,7 +96,7 @@ def getAccountsFromSeeds(seeds):
 
 def expandAccountIds(accounts):
     print(accounts)
-    
+
     expandedList = list()
 
     for accountId in accounts:
@@ -94,9 +104,9 @@ def expandAccountIds(accounts):
             expandedList.append(mastodon.account(accountId))
             time.sleep(1)
         except MastodonError as e:
-            print("API Error with acct retrieval " + e)
+            print(f"API Error with acct retrieval {e}")
             continue
-    
+
     return expandedList
 
 
@@ -113,7 +123,6 @@ seedAccounts = [
 accountIds = getAccountsFromSeeds(seedAccounts)
 time.sleep(180)
 fullAccountList = expandAccountIds(accountIds)
-# fullAccountList = expandAccountIds([convertAccountNameToId(account) for account in seedAccounts])
 
 with open("UserData.json", "w") as file:
     json.dump(fullAccountList, file, default=str, indent=2)
