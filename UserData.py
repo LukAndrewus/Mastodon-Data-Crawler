@@ -9,7 +9,6 @@ import time
 # 2Check the followers and folowees and add them to the queuee
 # 3 loop back at step 1 for another account in the queue
 
-
 class crawlUserData:
 
     def __init__(self, mastadonInstance: Mastodon):
