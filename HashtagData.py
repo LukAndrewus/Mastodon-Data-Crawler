@@ -1,20 +1,29 @@
 from mastodon import Mastodon, MastodonError
 import json
-import datetime
+from datetime import datetime, timezone
 
 
 class crawlHashtagData:
 
-    def __init__(self, mastodonInstance: Mastodon, startDate, endDate, hashtags):
+    def __init__(self, mastodonInstance: Mastodon, startDate: datetime, endDate: datetime, hashtags: list[str]):
         self.mastodon = mastodonInstance
         self.start = startDate
         self.end = endDate
         self.hashtags = hashtags
 
     def getDataPerHashtag(self, hashtag) -> list[dict]:
-        endDate = self.end
-        startDate = self.start
-        toot_batch = self.mastodon.timeline_hashtag(hashtag)
+        minIDstart = (
+            int(
+                datetime(
+                    year=self.end.year, month=self.end.month, day=self.end.day, tzinfo=timezone.utc
+                ).timestamp()
+                * 1000
+            )
+            << 16
+        )
+
+        print("Collecting data from " + hashtag)
+        toot_batch = self.mastodon.timeline_hashtag(hashtag, min_id=minIDstart)
         data = list()
         enteredRange = False
 
@@ -24,12 +33,12 @@ class crawlHashtagData:
 
             for post in toot_batch:
                 correctRange = (
-                    post.created_at.date() >= startDate
-                    and post.created_at.date() <= endDate
+                    post.created_at.date() >= self.start
+                    and post.created_at.date() <= self.end
                 )
                 started_in_past = (
                     not enteredRange
-                ) and post.created_at.date() < startDate
+                ) and post.created_at.date() < self.start
                 finished_timeband = (not correctRange) and enteredRange
 
                 if correctRange:
@@ -41,14 +50,19 @@ class crawlHashtagData:
 
             if toot_batch is None:
                 break
-
+            
+            print(f"Number of posts collected from Hashtag: {len(data)}")
+            
             try:
                 toot_batch = self.mastodon.fetch_next(toot_batch)
             except MastodonError as e:
                 print(f"Error from API {e}")
-                break
-
-            return data
+                while True:
+                    try:
+                        toot_batch = self.mastodon.fetch_next(toot_batch)
+                        break
+                    except:
+                        print("Trying Again")
 
         return data
 

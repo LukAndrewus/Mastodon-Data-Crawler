@@ -1,5 +1,5 @@
 from mastodon import Mastodon, MastodonError
-import datetime
+from datetime import datetime, timezone
 import json
 import time
 
@@ -30,9 +30,17 @@ class crawlUserData:
         return Id
 
     def getStatusesPerAccount(self, id):
-        endDate = self.end
-        startDate = self.start
-        toot_batch = self.mastodon.account_statuses(id, exclude_reblogs=True)
+        minIDstart = (
+                    int(
+                        datetime(
+                            year=self.end.year, month=self.end.month, day=self.end.day, tzinfo=timezone.utc
+                        ).timestamp()
+                        * 1000
+                    )
+                    << 16
+                )
+        
+        toot_batch = self.mastodon.account_statuses(id, exclude_reblogs=True, min_id=minIDstart)
         data = list()
         enteredRange = False
 
@@ -42,12 +50,12 @@ class crawlUserData:
 
             for post in toot_batch:
                 correctRange = (
-                    post.created_at.date() >= startDate
-                    and post.created_at.date() <= endDate
+                    post.created_at.date() >= self.start
+                    and post.created_at.date() <= self.end
                 )
                 started_in_past = (
                     not enteredRange
-                ) and post.created_at.date() < startDate
+                ) and post.created_at.date() < self.start
                 finished_timeband = (not correctRange) and enteredRange
 
                 if correctRange:

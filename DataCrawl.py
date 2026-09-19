@@ -7,22 +7,26 @@ from mastodon import Mastodon
 mastodon = Mastodon(access_token="pytooter_usercred.secret")
 
 seedAccounts = [
-    "@patlikestechnology@infosec.exchange",
-    "@ai6yr@m.ai6yr.org",
-    "@jalley@sfba.social",
-    "@BruceMirken@mas.to",
-    "@WeatherGoddess@journa.host",
+    "@theguardian_us_environment@halo.nu",
+    "@theguardian_climate_crisis@halo.nu",
+    "@larryneufeld@mstdn.ca",
+    "@BibbleCo@infosec.exchange",
+    "@GregCocks@techhub.social",
+    "@ChrisCorrigan@cosocial.ca"
 ]
 
 hashtags = [
-    "hurricanelowell",
-    "lowell",
-    "kauai",
-    "hawaiianislands",
+    "HurricaneHelene",
+    "helene",
+    "asheville",
+    "northcarolina",
+    "WNC",
+    "Hurricane",
+    "flooding"
 ]
 
-startOfDisaster = datetime.date(day=1, month=9, year=2026)
-endOfDisaster = datetime.date(day=13, month=9, year=2026)
+startOfDisaster = datetime.date(day=24, month=9, year=2024)
+endOfDisaster = datetime.date(day=31, month=10, year=2024)
 
 HashtagCrawlInstance = crawlHashtagData(
     mastodon, startDate=startOfDisaster, endDate=endOfDisaster, hashtags=hashtags
@@ -30,10 +34,10 @@ HashtagCrawlInstance = crawlHashtagData(
 
 UserCrawlInstance = crawlUserData(
     mastodon,
-    startDate=datetime.date(day=1, month=9, year=2026),
-    endDate=datetime.date(day=13, month=9, year=2026),
+    startDate=startOfDisaster,
+    endDate=endOfDisaster,
     seedAccounts=seedAccounts,
 )
 
-HashtagCrawlInstance.getHashtagDataMain()
+# HashtagCrawlInstance.getHashtagDataMain()
 UserCrawlInstance.getUserDataMain()
