@@ -11,8 +11,11 @@ import time
 
 class crawlUserData:
 
-    def __init__(self, mastadonInstance: Mastodon):
+    def __init__(self, mastadonInstance: Mastodon, startDate, endDate, seedAccounts):
         self.mastodon: Mastodon = mastadonInstance
+        self.start = startDate
+        self.end = endDate
+        self.seedAccounts = seedAccounts
 
     def convertAccountNameToId(self, name):
 
@@ -27,8 +30,8 @@ class crawlUserData:
         return Id
 
     def getStatusesPerAccount(self, id):
-        endDate = datetime.date(day=13, month=9, year=2026)
-        startDate = datetime.date(day=1, month=9, year=2026)
+        endDate = self.end
+        startDate = self.start
         toot_batch = self.mastodon.account_statuses(id, exclude_reblogs=True)
         data = list()
         enteredRange = False
@@ -122,15 +125,8 @@ class crawlUserData:
     ### MAIN ###
 
     def getUserDataMain(self):
-        seedAccounts = [
-            "@patlikestechnology@infosec.exchange",
-            "@ai6yr@m.ai6yr.org",
-            "@jalley@sfba.social",
-            "@BruceMirken@mas.to",
-            "@WeatherGoddess@journa.host",
-        ]
 
-        accountIds = self.getAccountsFromSeeds(seedAccounts)
+        accountIds = self.getAccountsFromSeeds(self.seedAccounts)
         time.sleep(180)
         fullAccountList = self.expandAccountIds(accountIds)
 

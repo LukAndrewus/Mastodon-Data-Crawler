@@ -5,12 +5,15 @@ import datetime
 
 class crawlHashtagData:
 
-    def __init__(self, mastodonInstance: Mastodon):
+    def __init__(self, mastodonInstance: Mastodon, startDate, endDate, hashtags):
         self.mastodon = mastodonInstance
+        self.start = startDate
+        self.end = endDate
+        self.hashtags = hashtags
 
     def getDataPerHashtag(self, hashtag) -> list[dict]:
-        endDate = datetime.date(day=13, month=9, year=2026)
-        startDate = datetime.date(day=1, month=9, year=2026)
+        endDate = self.end
+        startDate = self.start
         toot_batch = self.mastodon.timeline_hashtag(hashtag)
         data = list()
         enteredRange = False
@@ -24,7 +27,9 @@ class crawlHashtagData:
                     post.created_at.date() >= startDate
                     and post.created_at.date() <= endDate
                 )
-                started_in_past = (not enteredRange) and post.created_at.date() < startDate
+                started_in_past = (
+                    not enteredRange
+                ) and post.created_at.date() < startDate
                 finished_timeband = (not correctRange) and enteredRange
 
                 if correctRange:
@@ -47,8 +52,9 @@ class crawlHashtagData:
 
         return data
 
-
-    def removeDuplicateStatuses(self, ):
+    def removeDuplicateStatuses(
+        self,
+    ):
         seen = set()
         cleanData = list()
         duplicateNumber = 1
@@ -71,7 +77,6 @@ class crawlHashtagData:
         with open("HashtagData.json", "w") as json_file:
             json.dump(cleanData, json_file, default=str, indent=2)
 
-
     def getHashtagData(self, hashtags):
 
         hashtagData = list()
@@ -82,8 +87,9 @@ class crawlHashtagData:
         with open("HashtagData.json", "w") as json_file:
             json.dump(hashtagData, json_file, default=str)
 
-
-    def addStatusContext(self, ):
+    def addStatusContext(
+        self,
+    ):
         newData = list()
 
         with open("HashtagData.json", "r") as file:
@@ -103,19 +109,10 @@ class crawlHashtagData:
         with open("HashtagData.json", "w") as file:
             json.dump(data, file, default=str, indent=2)
 
-
     ###MAIN###
-
 
     def getHashtagDataMain(self):
 
-        hashtags = [
-            "hurricanelowell",
-            "lowell",
-            "kauai",
-            "hawaiianislands",
-        ]
-
-        self.getHashtagData(hashtags)
+        self.getHashtagData(self.hashtags)
         self.removeDuplicateStatuses()
         self.addStatusContext()
