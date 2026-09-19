@@ -47,6 +47,10 @@ def buildGraphFromAccountData():
     with open("UserData.json", "r") as file:
         data = json.load(file)
 
+    for user in data:
+        if user["mentioned_by"] is None:
+            user["mentioned_by"] = ""
+
     G = nx.Graph()
 
     for user in data:

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 class crawlHashtagData:
 
-    def __init__(self, mastodonInstance: Mastodon, startDate: datetime, endDate: datetime, hashtags: list[str]):
+    def __init__(self, mastodonInstance: Mastodon, startDate, endDate, hashtags: list[str]):
         self.mastodon = mastodonInstance
         self.start = startDate
         self.end = endDate

@@ -76,7 +76,7 @@ class crawlUserData:
 
         return data
 
-    def getMentionsFromStatuses(self, data, parentID) -> list[tuple[str, str]]:
+    def getMentionsFromStatuses(self, data, parentID: str) -> list[tuple[str, str]]:
         accounts = set()
 
         for status in data:
@@ -98,7 +98,7 @@ class crawlUserData:
                 f"Gathering posts from {self.mastodon.account(account_queue[0][0]).acct}"
             )
             statuses = self.getStatusesPerAccount(account_queue[0][0])
-            account_mentions = self.getMentionsFromStatuses(statuses, account_queue[0])
+            account_mentions = self.getMentionsFromStatuses(statuses, account_queue[0][0])
             print(f"Gained {len(account_mentions)} users from posts!\n")
 
             account_queue.pop(0)
