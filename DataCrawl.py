@@ -1,7 +1,6 @@
 from HashtagData import crawlHashtagData
 from UserData import crawlUserData
 import datetime
-
 from mastodon import Mastodon
 
 mastodon = Mastodon(access_token="pytooter_usercred.secret")
@@ -39,5 +38,5 @@ UserCrawlInstance = crawlUserData(
     seedAccounts=seedAccounts,
 )
 
-# HashtagCrawlInstance.getHashtagDataMain()
+HashtagCrawlInstance.getHashtagDataMain()
 UserCrawlInstance.getUserDataMain()
