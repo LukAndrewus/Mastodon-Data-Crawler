@@ -2,7 +2,7 @@ import networkx as nx
 import json
 import matplotlib.pyplot as plt
 
-def buildGraphFromHashtagData():
+def buildGraphFromHashtagData(export=False) -> nx.DiGraph:
 
     with open("CollectedData/HashtagData.json", "r") as file:
         postData = json.load(file)
@@ -40,9 +40,11 @@ def buildGraphFromHashtagData():
     for node in postData:
         G.nodes[node["id"]]["Size"] = (2.71) ** (G.degree(node["id"]))
 
-    nx.write_gexf(G, "GraphFiles/TootGraph.gexf")
+    if export: nx.write_gexf(G, "GraphFiles/TootGraph.gexf")
+    
+    return G
 
-def buildGraphFromAccountData():
+def buildGraphFromAccountData(export=False) -> nx.DiGraph:
 
     with open("CollectedData/UserData.json", "r") as file:
         data = json.load(file)
@@ -69,9 +71,11 @@ def buildGraphFromAccountData():
                 user["id"], user["mentioned_by"]
             )  # For now will only do the mentioned by connection
 
-    nx.write_gexf(G, "GraphFiles/UserGraph.gexf")
+    if export: nx.write_gexf(G, "GraphFiles/UserGraph.gexf")
+    
+    return G
 
 ### MAIN ###
 
-buildGraphFromHashtagData()
-buildGraphFromAccountData()
+postGraph = buildGraphFromHashtagData(export=True)
+userGraph = buildGraphFromAccountData(export=True)
