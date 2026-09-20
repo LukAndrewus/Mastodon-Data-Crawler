@@ -40,7 +40,7 @@ def buildGraphFromHashtagData():
     for node in postData:
         G.nodes[node["id"]]["Size"] = (2.71) ** (G.degree(node["id"]))
 
-    nx.write_gexf(G, "TootGraph.gexf")
+    nx.write_gexf(G, "GraphFiles/TootGraph.gexf")
 
 def buildGraphFromAccountData():
 
@@ -69,7 +69,7 @@ def buildGraphFromAccountData():
                 user["id"], user["mentioned_by"]
             )  # For now will only do the mentioned by connection
 
-    nx.write_gexf(G, "UserGraph.gexf")
+    nx.write_gexf(G, "GraphFiles/UserGraph.gexf")
 
 ### MAIN ###
 
