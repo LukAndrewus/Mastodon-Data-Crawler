@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def buildGraphFromHashtagData():
 
-    with open("HashtagData.json", "r") as file:
+    with open("CollectedData/HashtagData.json", "r") as file:
         postData = json.load(file)
 
     G = nx.DiGraph()
@@ -44,7 +44,7 @@ def buildGraphFromHashtagData():
 
 def buildGraphFromAccountData():
 
-    with open("UserData.json", "r") as file:
+    with open("CollectedData/UserData.json", "r") as file:
         data = json.load(file)
 
     for user in data:
@@ -61,11 +61,13 @@ def buildGraphFromAccountData():
             following_count=user["following_count"],
             url=user["url"],
             bot=user["bot"],
-            mentioned_by=user["mentioned_by"]
-            )
+            mentioned_by=user["mentioned_by"],
+        )
 
         if user["mentioned_by"] is not None:
-            G.add_edge(user["id"], user["mentioned_by"]) #For now will only do the mentioned by connection
+            G.add_edge(
+                user["id"], user["mentioned_by"]
+            )  # For now will only do the mentioned by connection
 
     nx.write_gexf(G, "UserGraph.gexf")
 
