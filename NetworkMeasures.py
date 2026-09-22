@@ -21,4 +21,4 @@ clusteringCoeff = nx.clustering(userGraph)
 plt.hist(list(userGraphPageRanking.values()), bins=15)
 plt.title("Distribution of PageRank in User Graph")
 
-plt.savefig("PageRank.png")
+plt.savefig("NetworkVisualizations/PageRank.png")
