@@ -2,6 +2,7 @@ from HashtagData import crawlHashtagData
 from UserData import crawlUserData
 import datetime
 from mastodon import Mastodon
+from GraphConstruction import buildGraphFromAccountData, buildGraphFromHashtagData
 
 mastodon = Mastodon(access_token="pytooter_usercred.secret")
 
@@ -40,3 +41,6 @@ UserCrawlInstance = crawlUserData(
 
 HashtagCrawlInstance.getHashtagDataMain()
 UserCrawlInstance.getUserDataMain()
+
+postGraph = buildGraphFromHashtagData(export=True)
+userGraph = buildGraphFromAccountData(export=True)

@@ -40,7 +40,7 @@ def buildGraphFromHashtagData(export=False) -> nx.DiGraph:
     for node in postData:
         G.nodes[node["id"]]["Size"] = (2.71) ** (G.degree(node["id"]))
 
-    if export: nx.write_gexf(G, "GraphFiles/TootGraph.gexf")
+    if export: nx.write_gexf(G, "GraphFiles/TootGraph.gexf") 
     
     return G
 
@@ -77,5 +77,4 @@ def buildGraphFromAccountData(export=False) -> nx.DiGraph:
 
 ### MAIN ###
 
-postGraph = buildGraphFromHashtagData(export=True)
-userGraph = buildGraphFromAccountData(export=True)
+
