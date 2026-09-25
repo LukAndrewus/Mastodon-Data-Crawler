@@ -11,7 +11,7 @@ def networkMeasures():
     plt.hist(list(userGraphPageRanking.values()), edgecolor="black")
     plt.yscale("log")
     plt.title("Distribution of PageRank")
-    plt.savefig("NetworkVisualizations/PageRank.png")
+    plt.savefig("PageRank.png")
     plt.close()
     ## Find the clustering distribution as measure (2)
 
@@ -19,7 +19,7 @@ def networkMeasures():
     plt.hist(list(clusteringCoeff.values()), color="brown")
     plt.title("Distribution of Clustering")
     plt.yscale("log")
-    plt.savefig("NetworkVisualizations/ClusteringDist.png")
+    plt.savefig("ClusteringDist.png")
     plt.close()
 
     ## Find the closeness centrality as measure (3)
@@ -28,7 +28,7 @@ def networkMeasures():
     plt.hist(list(closeness.values()), color="green", edgecolor="black", bins=20)
     plt.title("Distribution of Closeness")
     plt.axvline(statistics.mean(closeness.values()), linewidth=2, color="k")
-    plt.savefig("NetworkVisualizations/Closeness.png")
+    plt.savefig("Closeness.png")
     plt.close()
 
     ## One hope relations

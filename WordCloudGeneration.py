@@ -13,4 +13,4 @@ def cloudVisualization():
     plt.figure(figsize=(10,5))
     plt.imshow(wordcloud, interpolation="bilinear") 
     plt.axis("off")
-    plt.savefig("NetworkVisualizations/WordCloud-HurricaneHelene")
+    plt.savefig("WordCloud-HurricaneHelene")
