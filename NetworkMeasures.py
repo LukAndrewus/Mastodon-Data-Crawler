@@ -1,31 +1,46 @@
 from GraphConstruction import buildGraphFromAccountData
 import networkx as nx
 from matplotlib import pyplot as plt
+import statistics
 
-### Find the page rank of the user graph
+def networkMeasures():
+    ### Find the page rank of the user graph
 
-userGraph = buildGraphFromAccountData(False)
-userGraphPageRanking = nx.pagerank(userGraph)
-plt.hist(list(userGraphPageRanking.values()), bins=15)
-plt.title("Distribution of PageRank in User Graph")
-plt.savefig("NetworkVisualizations/PageRank.png")
-plt.close()
-## Find the degree distribution as measure (2)
+    userGraph = buildGraphFromAccountData(False)
+    userGraphPageRanking = nx.pagerank(userGraph)
+    plt.hist(list(userGraphPageRanking.values()), edgecolor="black")
+    plt.yscale("log")
+    plt.title("Distribution of PageRank")
+    plt.savefig("NetworkVisualizations/PageRank.png")
+    plt.close()
+    ## Find the clustering distribution as measure (2)
 
-clusteringCoeff = nx.clustering(userGraph)
-plt.hist(list(clusteringCoeff.values()), bins=30)
-plt.title("Distribution of clustering")
-plt.savefig("NetworkVisualizations/ClusteringDist.png")
-plt.close()
+    clusteringCoeff = nx.clustering(userGraph)
+    plt.hist(list(clusteringCoeff.values()), color="brown")
+    plt.title("Distribution of Clustering")
+    plt.yscale("log")
+    plt.savefig("NetworkVisualizations/ClusteringDist.png")
+    plt.close()
 
-## Find the betweenness centrality as measure (3)
+    ## Find the closeness centrality as measure (3)
 
-betweennessdist = nx.closeness_centrality(userGraph)
-# plt.pie(list(betweennessdist.values()))
-plt.hist(list(betweennessdist.values()), bins=15)
-plt.title("Distribution of betweenness")
-plt.savefig("NetworkVisualizations/BetweennessDist.png")
+    closeness = nx.closeness_centrality(userGraph)
+    plt.hist(list(closeness.values()), color="green", edgecolor="black", bins=20)
+    plt.title("Distribution of Closeness")
+    plt.axvline(statistics.mean(closeness.values()), linewidth=2, color="k")
+    plt.savefig("NetworkVisualizations/Closeness.png")
+    plt.close()
 
-## plot the histogram of the pagerank
+    ## One hope relations
+    Local_OneHop = [node[1] for node in userGraph.degree()]
+    max_degree = max(Local_OneHop)
+    min_degree = min(Local_OneHop)
+    median_degree = statistics.median(Local_OneHop)
+    high_degree = statistics.quantiles(data=Local_OneHop, n=5)
+
+    ## Global 
+    Global_average = 2 * userGraph.number_of_edges() / userGraph.number_of_nodes()
+
+    print(f"max degree: {max_degree} + min degree: {min_degree} + median degree: {median_degree} + high degree: {high_degree} + Global average degree: {Global_average}")
 
 

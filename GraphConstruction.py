@@ -74,7 +74,3 @@ def buildGraphFromAccountData(export=False) -> nx.DiGraph:
     if export: nx.write_gexf(G, "GraphFiles/UserGraph.gexf")
     
     return G
-
-### MAIN ###
-
-
